@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 enum TaskStatusEnum {
-  notStarted("notStarted"),
-  started("started"),
-  doing("doing"),
-  finished("finished");
+  notStarted("Not Started"),
+  started("Started"),
+  doing("Doing"),
+  finished("Finished");
 
   const TaskStatusEnum(this.name);
   final String name;

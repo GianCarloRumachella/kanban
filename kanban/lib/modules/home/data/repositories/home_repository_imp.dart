@@ -10,9 +10,19 @@ class HomeRepositoryImp implements HomeRepository {
   HomeRepositoryImp({required HomeDatasource datasource}) : _datasource = datasource;
 
   @override
-  Future<Either<Failure, List<TaskModel>>> getTasks() async {
+  Future<Either<Failure, List<Map<String, List<TaskModel>>>>> getTasks() async {
     try {
       var response = await _datasource.getTasks();
+      return Right(response);
+    } on Failure catch (e) {
+      return Left(e);
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> createNewTask(String task) async {
+    try {
+      var response = await _datasource.createNewTask(task);
       return Right(response);
     } on Failure catch (e) {
       return Left(e);

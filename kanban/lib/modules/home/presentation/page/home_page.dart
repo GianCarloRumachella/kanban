@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:kanban/modules/core/domain/enums/task_status_enum.dart';
-import 'package:kanban/modules/core/presentation/ui/widgets/task_widget.dart';
+import 'package:kanban/modules/core/presentation/ui/widgets/task_create_alert_widget.dart';
+import 'package:kanban/modules/core/presentation/ui/widgets/task_list_widget.dart';
 import 'package:kanban/modules/home/presentation/controllers/home_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,6 +26,7 @@ class _HomePageState extends State<HomePage> {
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) => Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
           title: const Text('Kanban'),
         ),
@@ -39,6 +41,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         ElevatedButton(
                           child: const Text('Load tasks'),
@@ -46,54 +49,57 @@ class _HomePageState extends State<HomePage> {
                             _controller.getTasks();
                           },
                         ),
-                        SizedBox(width: MediaQuery.sizeOf(context).width * 1.5),
+                        ElevatedButton(
+                          child: const Text('Add Task'),
+                          onPressed: () {
+                            TaskCreateAlertWidget.alert(
+                              context: context,
+                              title: "Nova Tarefa",
+                              body: <Widget>[
+                                TextField(
+                                  controller: _controller.titleController,
+                                ),
+                              ],
+                              buttons: Row(
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Modular.to.pop();
+                                    },
+                                    child: const Text("Cancelar"),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _controller.createNewTask();
+                                      Modular.to.pop();
+                                    },
+                                    child: const Text("OK"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                     Row(
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width * .3,
-                          child: _controller.taskList.value.isNotEmpty
-                              ? ValueListenableBuilder(
-                                  valueListenable: _controller.taskList,
-                                  builder: (context, value, child) {
-                                    return ListView.separated(
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: value.length,
-                                      itemBuilder: (context, index) {
-                                        return TaskWidget(
-                                          backgroundColor: TaskStatusEnum.getStatusColor(value[index].taskStatus),
-                                          taskName: value[index].name,
-                                        );
-                                      },
-                                      separatorBuilder: (BuildContext context, int index) {
-                                        return const SizedBox(height: 8);
-                                      },
-                                    );
-                                  },
-                                )
-                              : const Text('Lista vazia'),
+                        TaskList(
+                          list: _controller.notStartedList,
+                          listTitle: TaskStatusEnum.notStarted.name,
                         ),
-                        Container(
-                          width: MediaQuery.sizeOf(context).width * .4,
-                          height: MediaQuery.sizeOf(context).height,
-                          color: Colors.red,
+                        const SizedBox(width: 12),
+                        TaskList(
+                          list: _controller.startedList,
+                          listTitle: TaskStatusEnum.started.name,
                         ),
-                        Container(
-                          width: MediaQuery.sizeOf(context).width * .4,
-                          height: MediaQuery.sizeOf(context).height,
-                          color: Colors.blue,
-                        ),
-                        Container(
-                          width: MediaQuery.sizeOf(context).width * .4,
-                          height: MediaQuery.sizeOf(context).height,
-                          color: Colors.yellow,
-                        ),
-                        Container(
-                          width: MediaQuery.sizeOf(context).width * .4,
-                          height: MediaQuery.sizeOf(context).height,
-                          color: Colors.green,
+                        const SizedBox(width: 12),
+                        TaskList(list: _controller.doingList, listTitle: TaskStatusEnum.doing.name),
+                        const SizedBox(width: 12),
+                        TaskList(
+                          list: _controller.finishedList,
+                          listTitle: TaskStatusEnum.finished.name,
                         ),
                       ],
                     ),
@@ -103,58 +109,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        // body: SafeArea(
-        //   child: Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 16),
-        //     child: Row(
-        //       children: [
-        //         Expanded(
-        //           child: Column(
-        //             children: [
-        //               ElevatedButton(
-        //                 child: const Text('Load tasks'),
-        //                 onPressed: () {
-        //                   _controller.getTasks();
-        //                 },
-        //               ),
-        //               SizedBox(
-        //                 child: _controller.taskList.value.isNotEmpty
-        //                     ? ValueListenableBuilder(
-        //                         valueListenable: _controller.taskList,
-        //                         builder: (context, value, child) {
-        //                           return ListView.separated(
-        //                             physics: const NeverScrollableScrollPhysics(),
-        //                             shrinkWrap: true,
-        //                             itemCount: value.length,
-        //                             itemBuilder: (context, index) {
-        //                               return TaskWidget(
-        //                                 backgroundColor: TaskStatusEnum.getStatusColor(value[index].taskStatus),
-        //                                 taskName: value[index].name,
-        //                               );
-        //                             },
-        //                             separatorBuilder: (BuildContext context, int index) {
-        //                               return const SizedBox(height: 8);
-        //                             },
-        //                           );
-        //                         },
-        //                       )
-        //                     : const Text('Lista vazia'),
-        //               ),
-        //               const SizedBox(height: 16),
-        //             ],
-        //           ),
-        //         ),
-        //         Expanded(
-        //           child: Column(
-        //             children: [
-        //               Container(color: Colors.teal),
-        //             ],
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
       ),
     );
   }

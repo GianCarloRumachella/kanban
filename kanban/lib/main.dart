@@ -5,15 +5,21 @@ import 'package:kanban/app_module.dart';
 import 'package:kanban/app_widget.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-    [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft],
-  ).then(
-    (_) => runApp(
-      ModularApp(
-        module: AppModule(),
-        child: const AppWidget(),
-      ),
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //   [DeviceOrientation.landscapeRight, DeviceOrientation.landscapeLeft],
+  // ).then(
+  //   (_) => runApp(
+  //     ModularApp(
+  //       module: AppModule(),
+  //       child: const AppWidget(),
+  //     ),
+  //   ),
+  // );
+  runApp(
+    ModularApp(
+      module: AppModule(),
+      child: const AppWidget(),
     ),
   );
 }

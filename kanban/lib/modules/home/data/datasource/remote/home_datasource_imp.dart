@@ -14,7 +14,46 @@ class HomeDatasourceImp implements HomeDatasource {
   ];
 
   @override
-  Future<List<TaskModel>> getTasks() async {
-    return tasks;
+  Future<List<Map<String, List<TaskModel>>>> getTasks() async {
+    List<TaskModel> notStartedList = [];
+    List<TaskModel> startedList = [];
+    List<TaskModel> doingList = [];
+    List<TaskModel> finishedList = [];
+
+    List<Map<String, List<TaskModel>>> finalList = [];
+
+    for (var task in tasks) {
+      switch (task.taskStatus) {
+        case TaskStatusEnum.notStarted:
+          notStartedList.add(task);
+          break;
+        case TaskStatusEnum.started:
+          startedList.add(task);
+          break;
+        case TaskStatusEnum.doing:
+          doingList.add(task);
+          break;
+        case TaskStatusEnum.finished:
+          finishedList.add(task);
+          break;
+      }
+    }
+
+    finalList.add({"notStarted": notStartedList});
+    finalList.add({"started": startedList});
+    finalList.add({"doing": doingList});
+    finalList.add({"finished": finishedList});
+
+    return finalList;
+  }
+
+  @override
+  Future<bool> createNewTask(String task) async {
+    try {
+      tasks.add(TaskModel(id: tasks.length + 1, name: task, taskStatus: TaskStatusEnum.notStarted, idProject: 1));
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
