@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:kanban/modules/core/domain/enums/task_status_enum.dart';
+import 'package:kanban/modules/core/presentation/ui/widgets/app_snackbar_widget.dart';
+import 'package:kanban/modules/core/presentation/ui/widgets/app_textformfield_widget.dart';
 import 'package:kanban/modules/core/presentation/ui/widgets/task_create_alert_widget.dart';
 import 'package:kanban/modules/core/presentation/ui/widgets/task_list_widget.dart';
+import 'package:kanban/modules/core/validators/validator.dart';
 import 'package:kanban/modules/home/presentation/controllers/home_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -46,7 +49,7 @@ class _HomePageState extends State<HomePage> {
                         ElevatedButton(
                           child: const Text('Load tasks'),
                           onPressed: () {
-                            _controller.getTasks();
+                            _controller.getTasks(context);
                           },
                         ),
                         ElevatedButton(
@@ -56,8 +59,14 @@ class _HomePageState extends State<HomePage> {
                               context: context,
                               title: "Nova Tarefa",
                               body: <Widget>[
-                                TextField(
-                                  controller: _controller.titleController,
+                                Form(
+                                  key: _controller.createTaskKey,
+                                  child: AppTextFormField(
+                                    controller: _controller.titleController,
+                                    validator: (value) {
+                                      return Validator.isEmpty(value ?? '');
+                                    },
+                                  ),
                                 ),
                               ],
                               buttons: Row(
@@ -71,8 +80,11 @@ class _HomePageState extends State<HomePage> {
                                   const SizedBox(width: 16),
                                   ElevatedButton(
                                     onPressed: () {
-                                      _controller.createNewTask();
-                                      Modular.to.pop();
+                                      if (_controller.validateForm()) {
+                                        _controller.createNewTask(context);
+                                      } else {
+                                        AppSnackbarWidget.snackBar(context: context, message: "Nome da tarefa não pode ser vazio");
+                                      }
                                     },
                                     child: const Text("OK"),
                                   ),
@@ -95,7 +107,10 @@ class _HomePageState extends State<HomePage> {
                           listTitle: TaskStatusEnum.started.name,
                         ),
                         const SizedBox(width: 12),
-                        TaskList(list: _controller.doingList, listTitle: TaskStatusEnum.doing.name),
+                        TaskList(
+                          list: _controller.doingList,
+                          listTitle: TaskStatusEnum.doing.name,
+                        ),
                         const SizedBox(width: 12),
                         TaskList(
                           list: _controller.finishedList,

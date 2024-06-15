@@ -13,6 +13,9 @@ class HomeRepositoryImp implements HomeRepository {
   Future<Either<Failure, List<Map<String, List<TaskModel>>>>> getTasks() async {
     try {
       var response = await _datasource.getTasks();
+      if(response.isEmpty){
+        return Left(Failure("Erro!, lista de tarefas vazia, tente novamente mais tarde"));
+      }
       return Right(response);
     } on Failure catch (e) {
       return Left(e);

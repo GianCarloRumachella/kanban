@@ -80,6 +80,7 @@ class TaskList extends StatelessWidget {
                                           backgroundColor: TaskStatusEnum.getStatusColor(value[index].taskStatus),
                                           taskName: value[index].name,
                                           id: value[index].id,
+                                          status: value[index].taskStatus,
                                         );
                                       },
                                       separatorBuilder: (BuildContext context, int index) {
